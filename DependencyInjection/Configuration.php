@@ -193,6 +193,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *   - [level]: level name or int value, defaults to DEBUG
  *   - [bubble]: bool, defaults to true
  *
+ * - mandrill:
+ *   - token: A valid Mandrill API key
+ *
  * - cube:
  *   - url: http/udp url to the cube server
  *   - [level]: level name or int value, defaults to DEBUG
@@ -342,7 +345,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('icon_emoji')->defaultNull()->end() // slack
                             ->scalarNode('notify')->defaultFalse()->end() // hipchat
                             ->scalarNode('nickname')->defaultValue('Monolog')->end() // hipchat
-                            ->scalarNode('token')->end() // pushover & hipchat & loggly & logentries & flowdock & rollbar & slack
+                            ->scalarNode('token')->end() // pushover & hipchat & loggly & logentries & flowdock & rollbar & slack & mandrill
                             ->scalarNode('source')->end() // flowdock
                             ->booleanNode('use_ssl')->defaultTrue()->end() // logentries & hipchat
                             ->variableNode('user') // pushover
@@ -670,6 +673,10 @@ class Configuration implements ConfigurationInterface
                             ->thenInvalid('The token and channel have to be specified to use a SlackHandler')
                         ->end()
                         ->validate()
+                            ->ifTrue(function ($v) { return 'mandrill' === $v['type'] && empty($v['token']); })
+                            ->thenInvalid('The token has to be specified to use a MandrillHandler')
+                        ->end()
+                         ->validate()
                             ->ifTrue(function ($v) { return 'cube' === $v['type'] && empty($v['url']); })
                             ->thenInvalid('The url has to be specified to use a CubeHandler')
                         ->end()

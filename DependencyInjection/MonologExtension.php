@@ -511,6 +511,12 @@ class MonologExtension extends Extension
             ));
             break;
 
+        case 'mandrill':
+            $definition->setArguments(array(
+               $handler['token'],
+            ));
+           break;
+
         case 'cube':
             $definition->setArguments(array(
                 $handler['url'],
